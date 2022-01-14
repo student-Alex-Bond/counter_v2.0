@@ -3,23 +3,36 @@ import './App.css';
 import SetValues from "./components/SetValues/SetVaues";
 import DisplayedValues from "./components/DisplayedValues/DisplayedValues";
 
+export type displayStylePropsType = typeof displayStyleProps
+
+const displayStyleProps = {
+    countMaxStyle: {},
+    buttonProps: {
+        style: {},
+        disabled: false
+    },
+}
 
 function App() {
 
 // component DisplayedValues
+
     let newCount: number = 0
     let newMaxValue: number = 0
 
+    // функция парсигна localStorage
     const parseValueLocalStorage = (value: string) => {
         let newCountAsString = localStorage.getItem(value)
         if (newCountAsString) {
             newCount = Number(JSON.parse(newCountAsString))
-
         }
         return newCount
     }
 
-    let [count, setCount] = React.useState(parseValueLocalStorage('startValueKey'))
+    newCount = parseValueLocalStorage('startValueKey')
+    newMaxValue = parseValueLocalStorage('maxValueKey')
+
+    let [count, setCount] = React.useState(newCount)
 
     const incrementHandler = () => {
         setCount(count + 1)
@@ -29,28 +42,27 @@ function App() {
         setCount(0)
     }
 
+
 // component SetValues
-
-
     let InitialMaxValue = String(parseValueLocalStorage('maxValueKey'))
-    // let InitialMaxValueAsString = localStorage.getItem('maxValueKey')
-    // if (InitialMaxValueAsString) {
-    //     InitialMaxValue = JSON.parse(InitialMaxValueAsString)
-    // }
-
     let InitialStartValue = String(parseValueLocalStorage('startValueKey'))
-    // let InitialStartValueAsString = localStorage.getItem('startValueKey')
-    // if (InitialStartValueAsString) {
-    //     InitialStartValue = JSON.parse(InitialStartValueAsString)
-    // }
-
 
     let [maxValue, setMaxValue] = React.useState<string>(InitialMaxValue)
     let [startValue, setStartValue] = React.useState<string>(InitialStartValue)
 
+    // изменение стилей
+
+    // стили для DisplayedValues component
+    displayStyleProps.countMaxStyle = count === Number(maxValue) ? {
+        color: 'red',
+        fontSize: '125px',
+        fontWeight: 'bold'
+    } : {}
+    displayStyleProps.buttonProps.style = count === Number(maxValue) ? {opacity: '0.5'} : {}
+    displayStyleProps.buttonProps.disabled = count === Number(maxValue)
 
 
-
+    // Обработчики Событий
     const onChangeMaxValueHandler = (event: ChangeEvent<HTMLInputElement>) => {
         maxValue = event.currentTarget.value
         setMaxValue(maxValue)
@@ -85,11 +97,12 @@ function App() {
         setCount(newCount)
     }, [newCount])
 
-    // Object Props
+    // Objects Props
     const DisplayedValuesProps = {
         count: count,
         incrementHandler: incrementHandler,
-        resetHandler: resetHandler
+        resetHandler: resetHandler,
+        displayStyleProps: displayStyleProps,
     }
 
     const SetValuesProps = {
