@@ -7,10 +7,23 @@ export type displayStylePropsType = typeof displayStyleProps
 
 const displayStyleProps = {
     countMaxStyle: {},
-    buttonProps: {
+    buttonPropsInc: {
         style: {},
         disabled: false
     },
+    buttonPropsReset: {
+        style: {},
+        disabled: false
+    }
+}
+
+export type setValuesStylePropsType = typeof setValuesStyleProps
+const setValuesStyleProps = {
+    style: {},
+    buttonPropsSetValue: {
+        style: {},
+        disabled: false
+    }
 }
 
 function App() {
@@ -39,16 +52,42 @@ function App() {
     }
 
     const resetHandler = () => {
-        setCount(0)
+        setCount(startValue)
     }
 
 
 // component SetValues
-    let InitialMaxValue = String(parseValueLocalStorage('maxValueKey'))
-    let InitialStartValue = String(parseValueLocalStorage('startValueKey'))
+    let InitialMaxValue = parseValueLocalStorage('maxValueKey')
+    let InitialStartValue = parseValueLocalStorage('startValueKey')
 
-    let [maxValue, setMaxValue] = React.useState<string>(InitialMaxValue)
-    let [startValue, setStartValue] = React.useState<string>(InitialStartValue)
+    let [maxValue, setMaxValue] = React.useState<number>(InitialMaxValue)
+    let [startValue, setStartValue] = React.useState<number>(InitialStartValue)
+
+    // блок с ошибками
+
+    let error: any = ''
+    if (startValue === maxValue || maxValue < startValue || startValue <=-1 || maxValue <=-1) {
+        error = <span
+            style={{color: 'red', fontSize: '60px', fontWeight: 'bold'}}>Incorrect value
+        </span>
+        displayStyleProps.buttonPropsReset.disabled = true
+        displayStyleProps.buttonPropsInc.disabled = true
+        displayStyleProps.buttonPropsReset.style = {opacity: '0.5'}
+        setValuesStyleProps.style = {backgroundColor: 'red', border: 'red'}
+        setValuesStyleProps.buttonPropsSetValue.disabled = true
+        setValuesStyleProps.buttonPropsSetValue.style = {opacity: '0.5'}
+    } else {
+        // обнуление стилей Displayed component
+        displayStyleProps.buttonPropsReset.style = {}
+        displayStyleProps.buttonPropsReset.disabled = false
+
+        // обнуление стилей SetValue component
+        setValuesStyleProps.style = {}
+        setValuesStyleProps.buttonPropsSetValue.style = {}
+        setValuesStyleProps.buttonPropsSetValue.disabled = false
+
+    }
+
 
     // изменение стилей
 
@@ -58,51 +97,52 @@ function App() {
         fontSize: '125px',
         fontWeight: 'bold'
     } : {}
-    displayStyleProps.buttonProps.style = count === Number(maxValue) ? {opacity: '0.5'} : {}
-    displayStyleProps.buttonProps.disabled = count === Number(maxValue)
+    displayStyleProps.buttonPropsInc.style = count === Number(maxValue) ? {opacity: '0.5'} : {}
+    displayStyleProps.buttonPropsInc.disabled = count === Number(maxValue)
 
 
     // Обработчики Событий
     const onChangeMaxValueHandler = (event: ChangeEvent<HTMLInputElement>) => {
-        maxValue = event.currentTarget.value
-        setMaxValue(maxValue)
+        let maxValueAsString = event.currentTarget.value
+        if (maxValueAsString) {
+            maxValue = Number(maxValueAsString)
+            setMaxValue(maxValue)
+        }
+
     }
 
     const onChangeStartValueHandler = (event: ChangeEvent<HTMLInputElement>) => {
-        startValue = event.currentTarget.value
-        setStartValue(startValue)
+        let startValueAsString = event.currentTarget.value
+        if(startValueAsString) {
+            startValue = Number(startValueAsString)
+            setStartValue(startValue)
+        }
+
     }
 
     const setToLocalStorageHandler = () => {
         localStorage.setItem('maxValueKey', JSON.stringify(maxValue))
         localStorage.setItem('startValueKey', JSON.stringify(startValue))
 
-
         newCount = parseValueLocalStorage('startValueKey')
         setCount(newCount)
         newMaxValue = parseValueLocalStorage('maxValueKey')
-        // let newCountAsString = localStorage.getItem('startValueKey')
-        // if (newCountAsString) {
-        //     newCount = Number(JSON.parse(newCountAsString))
-        //     setCount(newCount)
-        // }
-        // let maxValueAsString = localStorage.getItem('maxValueKey')
-        // if (maxValueAsString) {
-        //     newMaxValue = Number(JSON.parse(maxValueAsString))
-        // }
-
     }
+
+
+    // hoc useEffect
 
     useEffect(() => {
         setCount(newCount)
-    }, [newCount])
+    }, [newCount, newMaxValue])
 
-    // Objects Props
+    // Objects props for components
     const DisplayedValuesProps = {
         count: count,
         incrementHandler: incrementHandler,
         resetHandler: resetHandler,
         displayStyleProps: displayStyleProps,
+        error: error
     }
 
     const SetValuesProps = {
@@ -110,7 +150,8 @@ function App() {
         onChangeStartValueHandler: onChangeStartValueHandler,
         setToLocalStorageHandler: setToLocalStorageHandler,
         startValue: startValue,
-        maxValue: maxValue
+        maxValue: maxValue,
+        setValuesStyleProps: setValuesStyleProps
 
     }
 
