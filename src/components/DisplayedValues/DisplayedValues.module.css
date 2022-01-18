@@ -26,7 +26,12 @@
     justify-content: space-around;
     align-items: center;
 }
+.spanText {
+    font-size:60px;
 
-.spanTextSize {
-    font-size: 105px
+}
+.spanTextSizeBig {
+    font-size: 105px;
+    color: red;
+    font-weight: bold;
 }

@@ -1,53 +1,32 @@
-import React, {ChangeEvent, useEffect} from 'react';
+import React, {useEffect} from 'react';
 import './App.css';
 import SetValues from "./components/SetValues/SetVaues";
 import DisplayedValues from "./components/DisplayedValues/DisplayedValues";
 
-export type displayStylePropsType = typeof displayStyleProps
-
-const displayStyleProps = {
-    countMaxStyle: {},
-    buttonPropsInc: {
-        style: {},
-        disabled: false
-    },
-    buttonPropsReset: {
-        style: {},
-        disabled: false
-    }
-}
-
-export type setValuesStylePropsType = typeof setValuesStyleProps
-const setValuesStyleProps = {
-    style: {},
-    buttonPropsSetValue: {
-        style: {},
-        disabled: false
-    }
-}
 
 function App() {
 //debugger
-// component DisplayedValues
-
-    let newCountStartValue: number = 0
-
 
     // функция парсигна localStorage
     const parseValueLocalStorage = (value: string) => {
-    let newCountParseToLocalStorage = 0
-        let newCountAsString = localStorage.getItem(value)
-        if (newCountAsString) {
-            newCountParseToLocalStorage = Number(JSON.parse(newCountAsString))
+        let parseCountToLocalStorage = 0
+        let countAsString = localStorage.getItem(value)
+        if (countAsString) {
+            parseCountToLocalStorage = Number(JSON.parse(countAsString))
         }
-        return newCountParseToLocalStorage
+        return parseCountToLocalStorage
     }
 
-    newCountStartValue = parseValueLocalStorage('startValueKey')
+    // state счетчика
+    let [count, setCount] = React.useState<number>(parseValueLocalStorage('startValueKey'))
 
+    // state блока усановок
+    let [maxValue, setMaxValue] = React.useState<number>(parseValueLocalStorage('maxValueKey'))
+    let [startValue, setStartValue] = React.useState<number>(parseValueLocalStorage('startValueKey'))
 
-    let [count, setCount] = React.useState(newCountStartValue)
-
+    // state блока с ошибками и сообщениями
+    let [isMessage, setIsMessage] = React.useState<boolean>(false)
+    // let [error, setIsMessage] = React.useState(false)
 
     const incrementHandler = () => {
         setCount(count + 1)
@@ -58,75 +37,16 @@ function App() {
     }
 
 
-// component SetValues
-    let InitialMaxValue = parseValueLocalStorage('maxValueKey')
-    let InitialStartValue = newCountStartValue
-
-    let [maxValue, setMaxValue] = React.useState<number>(InitialMaxValue)
-    let [startValue, setStartValue] = React.useState<number>(InitialStartValue)
-
-    // блок с ошибками и изменениями стилей
-
-    let infoMessage: any = ''// спросить типизацию
-    if( maxValue !== InitialMaxValue || startValue !== InitialStartValue){
-        infoMessage = <span style={{height: '50px', display: 'block'}}>Press "Set" to apply settings</span>
-    }
-
-    let error: any = '' // спросить типизацию
-    if (startValue === maxValue || maxValue < startValue || startValue <=-1 || maxValue <=-1) {
-        infoMessage = ''
-        error = <span
-            style={{color: 'red', fontSize: '60px', fontWeight: 'bold'}}>Incorrect value
-        </span>
-        displayStyleProps.buttonPropsReset.disabled = true
-        displayStyleProps.buttonPropsInc.disabled = true
-        displayStyleProps.buttonPropsReset.style = {opacity: '0.5'}
-        displayStyleProps.buttonPropsInc.style = {opacity: '0.5'}
-        setValuesStyleProps.style = {backgroundColor: 'red', border: 'red'}
-        setValuesStyleProps.buttonPropsSetValue.disabled = true
-        setValuesStyleProps.buttonPropsSetValue.style = {opacity: '0.5'}
-    } else {
-        // обнуление стилей Displayed component
-        displayStyleProps.buttonPropsReset.style = {}
-        displayStyleProps.buttonPropsInc.style = {}
-        displayStyleProps.buttonPropsReset.disabled = false
-        displayStyleProps.buttonPropsInc.disabled = false
-
-        // обнуление стилей SetValue component
-        setValuesStyleProps.style = {}
-        setValuesStyleProps.buttonPropsSetValue.style = {}
-        setValuesStyleProps.buttonPropsSetValue.disabled = false
-
-        // изменение стилей
-
-        // стили для DisplayedValues component
-        displayStyleProps.countMaxStyle = count === Number(maxValue) ? {
-            color: 'red',
-            fontSize: '125px',
-            fontWeight: 'bold'
-        } : {}
-        displayStyleProps.buttonPropsInc.style = count === Number(maxValue) ? {opacity: '0.5'} : {}
-        displayStyleProps.buttonPropsInc.disabled = count === Number(maxValue)
-
-    }
-
-
     // Обработчики Событий
-    const onChangeMaxValueHandler = (event: ChangeEvent<HTMLInputElement>) => {
-        let maxValueAsString = event.currentTarget.value
-        if (maxValueAsString) {
-            maxValue = Number(maxValueAsString)
-            setMaxValue(maxValue)
-        }
 
+    const onChangeMaxValueHandler = (maxValue: number) => {
+        setMaxValue(maxValue)
+        setIsMessage(true)
     }
 
-    const onChangeStartValueHandler = (event: ChangeEvent<HTMLInputElement>) => {
-        let startValueAsString = event.currentTarget.value
-        if(startValueAsString) {
-            startValue = Number(startValueAsString)
-            setStartValue(startValue)
-        }
+    const onChangeStartValueHandler = (startValue: number) => {
+        setStartValue(startValue)
+        setIsMessage(true)
 
     }
 
@@ -135,47 +55,34 @@ function App() {
         localStorage.setItem('maxValueKey', JSON.stringify(maxValue))
         localStorage.setItem('startValueKey', JSON.stringify(startValue))
 
-        newCountStartValue = parseValueLocalStorage('startValueKey')
+        let newCountStartValue = parseValueLocalStorage('startValueKey')
         setCount(newCountStartValue)
+        setIsMessage(false)
 
     }
 
-
-
-
-    // hooc useEffect
+    // ho0c useEffect
 
     useEffect(() => {
-        setCount(newCountStartValue)
-        setMaxValue(maxValue)
-    }, [newCountStartValue, maxValue])
+        setCount(startValue)
 
-    // Objects props for components
-    const DisplayedValuesProps = {
-        count: count,
-        incrementHandler: incrementHandler,
-        resetHandler: resetHandler,
-        displayStyleProps: displayStyleProps,
-        error: error,
-        infoMessage: infoMessage
-    }
-
-    const SetValuesProps = {
-        onChangeMaxValueHandler: onChangeMaxValueHandler,
-        onChangeStartValueHandler: onChangeStartValueHandler,
-        setToLocalStorageHandler: setToLocalStorageHandler,
-        startValue: startValue,
-        maxValue: maxValue,
-        setValuesStyleProps: setValuesStyleProps
-
-    }
+    }, [startValue])
 
 
     return (
         <div className="App">
             <header className="App-header">
-                <SetValues {...SetValuesProps}/>
-                <DisplayedValues {...DisplayedValuesProps}/>
+                <SetValues onChangeMaxValueHandler={onChangeMaxValueHandler}
+                           onChangeStartValueHandler={onChangeStartValueHandler}
+                           setToLocalStorageHandler={setToLocalStorageHandler}
+                           startValue={startValue}
+                           maxValue={maxValue}/>
+
+                <DisplayedValues count={count}
+                                 maxValue = {maxValue}
+                                 incrementHandler={incrementHandler}
+                                 resetHandler={resetHandler}
+                                 isMessage={isMessage}/>
             </header>
         </div>
     );

@@ -1,29 +1,48 @@
 import React from 'react';
 import Button from "../Button/Button";
 import styles from './DisplayedValues.module.css'
-import {displayStylePropsType} from "../../App";
+
 
 type DisplayedValuesType = {
     count: number
+    maxValue: number
     incrementHandler: () => void
     resetHandler: () => void
-    displayStyleProps: displayStylePropsType
-    error: any
-    infoMessage: any
+    isMessage: boolean
 }
 
 
 const DisplayedValues = (props: DisplayedValuesType) => {
+   // debugger
+    // изменение цвета значения счетчика при достижении maxValue
+    const buttonStyleProps = {
+        disabled: false,
+        style: {}
+    }
+    let spanTextSize = styles.spanText
 
+    if (props.count === props.maxValue) {
+        spanTextSize = styles.spanTextSizeBig
+        buttonStyleProps.disabled = true
+        buttonStyleProps.style = {opacity: '0.5'}
+    }
+let ViewValue = props.isMessage ? " Press 'Set' apply value " : props.count
 
     return (
         <div className={styles.mainWrapper}>
             <div className={styles.wrapperValue}>
-                <span className={styles.spanTextSize} style={props.displayStyleProps.countMaxStyle}>{ props.error || props.infoMessage || props.count }</span>
+                <span className={spanTextSize}>
+                    {ViewValue}
+                </span>
             </div>
+
             <div className={styles.wrapperButton}>
-                <Button onClick = {props.incrementHandler} {...props.displayStyleProps.buttonPropsInc} >Inc</Button>
-                <Button onClick={props.resetHandler} {...props.displayStyleProps.buttonPropsReset}>Reset</Button>
+                <Button onClick={props.incrementHandler} {...buttonStyleProps}>
+                    Inc
+                </Button>
+                <Button onClick={props.resetHandler}>
+                    Reset
+                </Button>
             </div>
         </div>
     );

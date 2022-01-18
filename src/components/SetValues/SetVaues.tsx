@@ -1,28 +1,49 @@
 import React, {ChangeEvent} from 'react';
 import Button from "../Button/Button";
-import InputValues from "../InputValues/InputValues";
 import styles from './SetValues.module.css'
-import {setValuesStylePropsType} from "../../App";
+
 
 type SetValuesProps = {
-    onChangeMaxValueHandler: (event: ChangeEvent<HTMLInputElement>) => void
-    onChangeStartValueHandler: (event: ChangeEvent<HTMLInputElement>) => void
+    onChangeMaxValueHandler: (maxValue: number) => void
+    onChangeStartValueHandler: (startValue: number) => void
     setToLocalStorageHandler: () => void
     startValue: number
     maxValue: number
-    setValuesStyleProps: setValuesStylePropsType
+
 }
 
 const SetValues = (props: SetValuesProps) => {
 
-    return (
+    const changeMaxValue = (event: ChangeEvent<HTMLInputElement>)=> {
+        const newMaxValue = event.currentTarget.valueAsNumber
+        if (newMaxValue) {
+            props.onChangeMaxValueHandler(newMaxValue)
+        }
+    }
+
+    const changeStartValue = (event: ChangeEvent<HTMLInputElement>)=> {
+        const newStartValue = event.currentTarget.valueAsNumber
+        if (newStartValue) {
+            props.onChangeStartValueHandler(newStartValue)
+        }
+    }
+
+            return (
         <div className={styles.mainWrapper}>
             <div className={styles.wrapperValue}>
-                <InputValues setValuesStyleProps={props.setValuesStyleProps} value={props.maxValue.toString()} onChange={props.onChangeMaxValueHandler} >max value</InputValues>
-                <InputValues setValuesStyleProps={props.setValuesStyleProps} value={props.startValue.toString()} onChange={props.onChangeStartValueHandler}>start value</InputValues>
+
+                <div className={styles.wrapper}>
+                    <span style={styles}>max value:</span>
+                    <input value={props.maxValue}  onChange={changeMaxValue} type='number'/>
+                </div>
+
+                <div className={styles.wrapper}>
+                    <span style={styles}>start value:</span>
+                    <input value={props.startValue} onChange={changeStartValue} type='number'/>
+                </div>
             </div>
             <div className={styles.wrapperButton}>
-                <Button {...props.setValuesStyleProps.buttonPropsSetValue} onClick={props.setToLocalStorageHandler}>Set</Button>
+                <Button onClick={props.setToLocalStorageHandler}>Set</Button>
             </div>
         </div>
     );
