@@ -31,7 +31,7 @@ function App() {
 // component DisplayedValues
 
     let newCountStartValue: number = 0
-    let newMaxValue: number = 0
+
 
     // функция парсигна localStorage
     const parseValueLocalStorage = (value: string) => {
@@ -137,7 +137,7 @@ function App() {
 
         newCountStartValue = parseValueLocalStorage('startValueKey')
         setCount(newCountStartValue)
-        newMaxValue = parseValueLocalStorage('maxValueKey')
+
     }
 
 
