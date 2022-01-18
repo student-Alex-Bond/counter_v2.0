@@ -9,6 +9,7 @@ type DisplayedValuesType = {
     resetHandler: () => void
     displayStyleProps: displayStylePropsType
     error: any
+    infoMessage: any
 }
 
 
@@ -18,7 +19,7 @@ const DisplayedValues = (props: DisplayedValuesType) => {
     return (
         <div className={styles.mainWrapper}>
             <div className={styles.wrapperValue}>
-                <span className={styles.spanTextSize} style={props.displayStyleProps.countMaxStyle}>{props.error || props.count }</span>
+                <span className={styles.spanTextSize} style={props.displayStyleProps.countMaxStyle}>{ props.error || props.infoMessage || props.count }</span>
             </div>
             <div className={styles.wrapperButton}>
                 <Button onClick = {props.incrementHandler} {...props.displayStyleProps.buttonPropsInc} >Inc</Button>

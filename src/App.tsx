@@ -27,25 +27,27 @@ const setValuesStyleProps = {
 }
 
 function App() {
-
+//debugger
 // component DisplayedValues
 
-    let newCount: number = 0
+    let newCountStartValue: number = 0
     let newMaxValue: number = 0
 
     // функция парсигна localStorage
     const parseValueLocalStorage = (value: string) => {
+    let newCountParseToLocalStorage = 0
         let newCountAsString = localStorage.getItem(value)
         if (newCountAsString) {
-            newCount = Number(JSON.parse(newCountAsString))
+            newCountParseToLocalStorage = Number(JSON.parse(newCountAsString))
         }
-        return newCount
+        return newCountParseToLocalStorage
     }
 
-    newCount = parseValueLocalStorage('startValueKey')
-    newMaxValue = parseValueLocalStorage('maxValueKey')
+    newCountStartValue = parseValueLocalStorage('startValueKey')
 
-    let [count, setCount] = React.useState(newCount)
+
+    let [count, setCount] = React.useState(newCountStartValue)
+
 
     const incrementHandler = () => {
         setCount(count + 1)
@@ -58,47 +60,55 @@ function App() {
 
 // component SetValues
     let InitialMaxValue = parseValueLocalStorage('maxValueKey')
-    let InitialStartValue = parseValueLocalStorage('startValueKey')
+    let InitialStartValue = newCountStartValue
 
     let [maxValue, setMaxValue] = React.useState<number>(InitialMaxValue)
     let [startValue, setStartValue] = React.useState<number>(InitialStartValue)
 
-    // блок с ошибками
+    // блок с ошибками и изменениями стилей
 
-    let error: any = ''
+    let infoMessage: any = ''// спросить типизацию
+    if( maxValue !== InitialMaxValue || startValue !== InitialStartValue){
+        infoMessage = <span style={{height: '50px', display: 'block'}}>Press "Set" to apply settings</span>
+    }
+
+    let error: any = '' // спросить типизацию
     if (startValue === maxValue || maxValue < startValue || startValue <=-1 || maxValue <=-1) {
+        infoMessage = ''
         error = <span
             style={{color: 'red', fontSize: '60px', fontWeight: 'bold'}}>Incorrect value
         </span>
         displayStyleProps.buttonPropsReset.disabled = true
         displayStyleProps.buttonPropsInc.disabled = true
         displayStyleProps.buttonPropsReset.style = {opacity: '0.5'}
+        displayStyleProps.buttonPropsInc.style = {opacity: '0.5'}
         setValuesStyleProps.style = {backgroundColor: 'red', border: 'red'}
         setValuesStyleProps.buttonPropsSetValue.disabled = true
         setValuesStyleProps.buttonPropsSetValue.style = {opacity: '0.5'}
     } else {
         // обнуление стилей Displayed component
         displayStyleProps.buttonPropsReset.style = {}
+        displayStyleProps.buttonPropsInc.style = {}
         displayStyleProps.buttonPropsReset.disabled = false
+        displayStyleProps.buttonPropsInc.disabled = false
 
         // обнуление стилей SetValue component
         setValuesStyleProps.style = {}
         setValuesStyleProps.buttonPropsSetValue.style = {}
         setValuesStyleProps.buttonPropsSetValue.disabled = false
 
+        // изменение стилей
+
+        // стили для DisplayedValues component
+        displayStyleProps.countMaxStyle = count === Number(maxValue) ? {
+            color: 'red',
+            fontSize: '125px',
+            fontWeight: 'bold'
+        } : {}
+        displayStyleProps.buttonPropsInc.style = count === Number(maxValue) ? {opacity: '0.5'} : {}
+        displayStyleProps.buttonPropsInc.disabled = count === Number(maxValue)
+
     }
-
-
-    // изменение стилей
-
-    // стили для DisplayedValues component
-    displayStyleProps.countMaxStyle = count === Number(maxValue) ? {
-        color: 'red',
-        fontSize: '125px',
-        fontWeight: 'bold'
-    } : {}
-    displayStyleProps.buttonPropsInc.style = count === Number(maxValue) ? {opacity: '0.5'} : {}
-    displayStyleProps.buttonPropsInc.disabled = count === Number(maxValue)
 
 
     // Обработчики Событий
@@ -121,20 +131,24 @@ function App() {
     }
 
     const setToLocalStorageHandler = () => {
+        //debugger
         localStorage.setItem('maxValueKey', JSON.stringify(maxValue))
         localStorage.setItem('startValueKey', JSON.stringify(startValue))
 
-        newCount = parseValueLocalStorage('startValueKey')
-        setCount(newCount)
+        newCountStartValue = parseValueLocalStorage('startValueKey')
+        setCount(newCountStartValue)
         newMaxValue = parseValueLocalStorage('maxValueKey')
     }
 
 
-    // hoc useEffect
+
+
+    // hooc useEffect
 
     useEffect(() => {
-        setCount(newCount)
-    }, [newCount, newMaxValue])
+        setCount(newCountStartValue)
+        setMaxValue(maxValue)
+    }, [newCountStartValue, maxValue])
 
     // Objects props for components
     const DisplayedValuesProps = {
@@ -142,7 +156,8 @@ function App() {
         incrementHandler: incrementHandler,
         resetHandler: resetHandler,
         displayStyleProps: displayStyleProps,
-        error: error
+        error: error,
+        infoMessage: infoMessage
     }
 
     const SetValuesProps = {
