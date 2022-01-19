@@ -3,30 +3,54 @@ import Button from "../Button/Button";
 import styles from './DisplayedValues.module.css'
 
 
+
 type DisplayedValuesType = {
     count: number
     maxValue: number
     incrementHandler: () => void
     resetHandler: () => void
     isMessage: boolean
+    error: boolean
 }
 
 
 const DisplayedValues = (props: DisplayedValuesType) => {
-   // debugger
-    // изменение цвета значения счетчика при достижении maxValue
-    const buttonStyleProps = {
+    // debugger
+
+
+    //
+    const buttonStyleIncProps = {
         disabled: false,
         style: {}
     }
-    let spanTextSize = styles.spanText
+    const buttonStyleResetProps = {
+        disabled: false,
+        style: {}
+    }
 
+
+    // условие по которому если приходит error = true становятся неактиные кнопки
+    let spanTextSize = styles.spanText
+    if (props.error) {
+        buttonStyleIncProps.disabled = true
+        buttonStyleResetProps.disabled = true
+        buttonStyleIncProps.style = {opacity: '0.5'}
+        buttonStyleResetProps.style = {opacity: '0.5'}
+
+    }
+
+
+    // условие по которому цвет max значения счетика становится красным и кнопка не активной
     if (props.count === props.maxValue) {
         spanTextSize = styles.spanTextSizeBig
-        buttonStyleProps.disabled = true
-        buttonStyleProps.style = {opacity: '0.5'}
+        buttonStyleIncProps.disabled = true
+        buttonStyleIncProps.style = {opacity: '0.5'}
     }
-let ViewValue = props.isMessage ? " Press 'Set' apply value " : props.count
+    let ViewValue = props.error
+        ? <span className={styles.spanTextIncorrectValue}>Incorrect value</span>
+        : props.isMessage
+            ? <span className={styles.spanText}>Press 'Set' apply value</span>
+            : props.count
 
     return (
         <div className={styles.mainWrapper}>
@@ -37,10 +61,10 @@ let ViewValue = props.isMessage ? " Press 'Set' apply value " : props.count
             </div>
 
             <div className={styles.wrapperButton}>
-                <Button onClick={props.incrementHandler} {...buttonStyleProps}>
+                <Button onClick={props.incrementHandler} {...buttonStyleIncProps}>
                     Inc
                 </Button>
-                <Button onClick={props.resetHandler}>
+                <Button onClick={props.resetHandler} {...buttonStyleResetProps}>
                     Reset
                 </Button>
             </div>

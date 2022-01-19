@@ -28,10 +28,24 @@
 }
 .spanText {
     font-size:60px;
+    font-weight: normal;
+    color: cadetblue;
+
+}
+
+.spanTextIncorrectValue {
+    font-size:60px;
+    font-weight: normal;
+    color: red;
 
 }
 .spanTextSizeBig {
     font-size: 105px;
     color: red;
     font-weight: bold;
+}
+
+.spanTextError{
+    color: red;
+    font-size:60px;
 }

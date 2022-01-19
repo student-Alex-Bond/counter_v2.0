@@ -16,7 +16,6 @@ function App() {
         }
         return parseCountToLocalStorage
     }
-
     // state счетчика
     let [count, setCount] = React.useState<number>(parseValueLocalStorage('startValueKey'))
 
@@ -26,8 +25,10 @@ function App() {
 
     // state блока с ошибками и сообщениями
     let [isMessage, setIsMessage] = React.useState<boolean>(false)
-    // let [error, setIsMessage] = React.useState(false)
+    let [error, setIsError] = React.useState(false)
+    // Обработчики Событий
 
+    // увеличение или умеьшенине значения value
     const incrementHandler = () => {
         setCount(count + 1)
     }
@@ -36,8 +37,10 @@ function App() {
         setCount(startValue)
     }
 
+    const viewError = (flag: boolean) => {
+        setIsError(flag)
+    }
 
-    // Обработчики Событий
 
     const onChangeMaxValueHandler = (maxValue: number) => {
         setMaxValue(maxValue)
@@ -76,13 +79,17 @@ function App() {
                            onChangeStartValueHandler={onChangeStartValueHandler}
                            setToLocalStorageHandler={setToLocalStorageHandler}
                            startValue={startValue}
-                           maxValue={maxValue}/>
+                           maxValue={maxValue}
+                           viewError={viewError}
+                />
 
                 <DisplayedValues count={count}
-                                 maxValue = {maxValue}
+                                 maxValue={maxValue}
                                  incrementHandler={incrementHandler}
                                  resetHandler={resetHandler}
-                                 isMessage={isMessage}/>
+                                 isMessage={isMessage}
+                                 error={error}
+                />
             </header>
         </div>
     );
